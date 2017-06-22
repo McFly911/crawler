@@ -1,13 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>tdog</groupId>
-	<artifactId>lib</artifactId>
-	<version>1</version>
-
+	<groupId>com.mcfly911</groupId>
+	<artifactId>mcraw</artifactId>
+	<version>1.1</version>
 
 	<build>
-
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -19,14 +17,9 @@
 				</configuration>
 			</plugin>
 		</plugins>
-
 	</build>
 
-
-
-
 	<dependencies>
-
 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
@@ -55,12 +48,9 @@
 			<version>1.10.2.RELEASE</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/com.google.collections/google-collections
-		<dependency>
-			<groupId>com.google.collections</groupId>
-			<artifactId>google-collections</artifactId>
-			<version>1.0</version>
-		</dependency> -->
+		<!-- https://mvnrepository.com/artifact/com.google.collections/google-collections 
+			<dependency> <groupId>com.google.collections</groupId> <artifactId>google-collections</artifactId> 
+			<version>1.0</version> </dependency> -->
 
 
 		<!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->
@@ -155,11 +145,12 @@
 			<artifactId>j2ssh-maverick</artifactId>
 			<version>1.5.5</version>
 		</dependency>
-		
+
+
 		<dependency>
 			<groupId>org.seleniumhq.selenium</groupId>
 			<artifactId>selenium-server</artifactId>
-			<version>3.3.1</version>	
+			<version>3.4.0</version>
 		</dependency>
 
 	</dependencies>
