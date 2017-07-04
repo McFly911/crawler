@@ -15,7 +15,7 @@ import com.mcfly911.mcraw.jpa.BaseTable;
 import com.mcfly911.mcraw.jpa.IService;
 import com.mcfly911.mcraw.lib.ThreadLib;
 import com.mcfly911.mcraw.proxy.AbstractProxy;
-import com.mcfly911.mcraw.proxy.NullProxy;
+import com.mcfly911.mcraw.proxy.JsoupProxy;
 import com.mcfly911.mcraw.thread.ScraperBranch;
 
 public class Scraper {
@@ -23,7 +23,7 @@ public class Scraper {
 	/* Get out from Constructor */
 	private static final Logger LOG = LogManager.getLogger(Scraper.class);
 	private Constructor<? extends ScraperThread> aircraftLoader;
-	private List<? extends BaseTable> ssdList;
+	private List<? extends BaseTable> dataList;
 	private IService service = ScraperConfig.getService();
 	/**/
 
@@ -57,7 +57,7 @@ public class Scraper {
 	public void start() {
 
 		if (proxyList == null || proxyList.isEmpty()) {
-			proxyList = Arrays.asList(new NullProxy());
+			proxyList = Arrays.asList(new JsoupProxy());
 		}
 		Validate.noNullElements(new Object[] { aircraftClass, service, inputCollector, proxyList });
 
@@ -68,14 +68,14 @@ public class Scraper {
 		}
 
 		while (true) {
-			ssdList = inputCollector.collect(service);
-			if (ssdList.size() == 0) {
+			dataList = inputCollector.collect(service);
+			if (dataList.size() == 0) {
 				break;
 			}
 			if (this.randomizeInput) {
-				Collections.shuffle(ssdList);
+				Collections.shuffle(dataList);
 			}
-			LOG.info("Collected " + ssdList.size() + " SSDs");
+			LOG.info("Collected " + dataList.size() + " SSDs");
 			for (AbstractProxy skin : this.proxyList) {
 				new ScraperBranch(this, skin).start();
 			}
@@ -84,10 +84,10 @@ public class Scraper {
 		LOG.info("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	}
 
-	public synchronized BaseTable unloadSsd() throws EndOfSsdException {
-		if (!ssdList.isEmpty()) {
-			BaseTable ssd = ssdList.get(0);
-			ssdList.remove(0);
+	public synchronized BaseTable loadData() throws EndOfSsdException {
+		if (!dataList.isEmpty()) {
+			BaseTable ssd = dataList.get(0);
+			dataList.remove(0);
 			return ssd;
 		}
 		throw new EndOfSsdException();
@@ -126,11 +126,11 @@ public class Scraper {
 	}
 
 	public List<? extends BaseTable> getSsdList() {
-		return ssdList;
+		return dataList;
 	}
 
 	public void setSsdList(List<? extends BaseTable> ssdList) {
-		this.ssdList = ssdList;
+		this.dataList = ssdList;
 	}
 
 	public Class<? extends ScraperThread> getAircraftClass() {

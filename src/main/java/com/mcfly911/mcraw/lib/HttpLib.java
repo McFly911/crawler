@@ -1,6 +1,9 @@
 package com.mcfly911.mcraw.lib;
 
+import java.awt.Desktop;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +17,6 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.jsoup.Jsoup;
 
 public final class HttpLib {
 
@@ -26,10 +28,27 @@ public final class HttpLib {
 		return "https://www.google.com";
 	}
 
-	public static void main(String[] args) throws Exception {
-		// post2("http://lazylearn.com", "COOKIE.txt");
+	public static void openBrowserHtml(String html) {
+		try {
+			String fileName = "d:/libtmp.html";
+			TextFileLib.write(fileName, html);
+			File htmlFile = new File(fileName);
+			Desktop.getDesktop().browse(htmlFile.toURI());
+		} catch (Exception e) {
+		}
+	}
 
-		String s = Jsoup.connect("http://lazylearn.com").cookies(readCookieFromFile("d:/COOKIE.txt")).get().text();
+	public static String cookieToString(Map<String, String> cookies) {
+		String s = "";
+		for (Map.Entry<String, String> entry : cookies.entrySet()) {
+			s += entry.getKey() + "=" + entry.getValue() + "; ";
+		}
+		return s;
+	}
+
+	public static void showCookie(Map<String, String> cookies) {
+		System.out.println(cookies.size() + " properties");
+		String s = Arrays.toString(cookies.entrySet().toArray());
 		System.out.println(s);
 	}
 
@@ -45,10 +64,41 @@ public final class HttpLib {
 		List<String> lines = TextFileLib.readLineByLine(path);
 		Map<String, String> out = new HashMap<String, String>();
 		for (String line : lines) {
-			String[] parts = line.split("\\t");
-			out.put(parts[5], parts[6]);
+			try {
+				String[] parts = line.split("\\t");
+				out.put(parts[5], parts[6]);
+			} catch (Exception e) {
+				// System.out.println(line);
+			}
 		}
 		return out;
+	}
+
+	public static Map<String, String> readCookieFromHeaders(Header[] headers) {
+		Map<String, String> out = new HashMap<String, String>();
+		for (Header header : headers) {
+			String s = header.getValue();
+			String k, v;
+			if (s.contains("; ")) {
+				k = s.substring(0, s.indexOf("="));
+				v = s.substring(s.indexOf("=") + 1, s.indexOf("; "));
+
+			} else {
+				k = s.substring(0, s.indexOf("="));
+				v = s.substring(s.indexOf("=") + 1, s.length());
+
+			}
+			out.put(k, v);
+		}
+		return out;
+	}
+
+	public static void main(String[] args) {
+		String s = "keys=valuez";
+		String k = s.substring(0, s.indexOf("="));
+		String v = s.substring(s.indexOf("=") + 1, s.length());
+		System.out.println(k);
+		System.out.println(v);
 	}
 
 	// HTTP POST request

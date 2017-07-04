@@ -23,9 +23,9 @@ import com.mcfly911.mcraw.proxy.AbstractProxy;
 public class ScraperBranch implements Runnable {
 
 	private Thread launchAnAircraft() {
-		BaseTable ssd;
+		BaseTable data;
 		try {
-			ssd = scraper.unloadSsd();
+			data = scraper.loadData();
 		} catch (EndOfSsdException e) {
 			return null;
 		}
@@ -37,7 +37,7 @@ public class ScraperBranch implements Runnable {
 			LOG.fatal("", e);
 			return null;
 		}
-		aircraft.setSsd(ssd);
+		aircraft.setData(data);
 		aircraft.setAircraftCarrier(this);
 		aircraft.setProxy(proxy);
 		aircraft.setService(scraper.getService());
@@ -100,7 +100,7 @@ public class ScraperBranch implements Runnable {
 	}
 
 	public void start() {
-		new Thread(this).start();
+		new Thread(this, ScraperBranch.class.getName()).start();
 	}
 
 	protected static final Logger LOG = LogManager.getLogger(ScraperBranch.class);

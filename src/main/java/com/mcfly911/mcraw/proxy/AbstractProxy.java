@@ -29,7 +29,7 @@ public abstract class AbstractProxy {
 	public static List<AbstractProxy> getTestList(int size) {
 		List<AbstractProxy> list = new ArrayList<AbstractProxy>();
 		for (int i = 1; i <= size; i++) {
-			list.add(new NullProxy());
+			list.add(new JsoupProxy());
 		}
 		return list;
 	}
@@ -94,8 +94,12 @@ public abstract class AbstractProxy {
 		return cloaks;
 	}
 
-	public abstract ResponseObject getDocument(String url, int timeout, String userAgent, String referrer, Map<String, String> cookies) throws 
+	public abstract ResponseObject getDocument(String url, int timeout, String userAgent, String referrer, Map<String, String> cookies, Map<String, String> headers) throws 
 			WebException404, WebException500, WebExceptionTimeout, WebExceptionCircularRedirec, WebExceptionUnknown, Exception;
 
+	public abstract ResponseObject postDocument(String url, int timeout, String userAgent, String referrer, Map<String, String> cookies, Map<String, String> headers, Map<String, String> params) throws 
+	WebException404, WebException500, WebExceptionTimeout, WebExceptionCircularRedirec, WebExceptionUnknown, Exception;
+
+	
 	public abstract boolean testConnection();
 }

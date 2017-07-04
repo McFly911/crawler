@@ -26,7 +26,7 @@ public class TextFileLib {
 	}
 
 	public static List<String> readLineByLine(String fileName) {
-		System.out.println("Reading file:" + fileName);
+		//System.out.println("Reading file:" + fileName);
 		List<String> data = new ArrayList<String>();
 		try (BufferedReader br = new BufferedReader(new FileReader(fileName))) {
 			String currentLine;

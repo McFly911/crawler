@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 public interface BaseRepo<T> {
 
 	public List<T> findAllByLog1(String log);
+	public List<T> findAllByLog1OrderByLob01(String log);
 	public List<T> findAllByLog1(String log, Pageable pageAble);
 	public List<T> findAllByLog2(String log);
 	public List<T> findAllByLog2(String log, Pageable pageAble);
