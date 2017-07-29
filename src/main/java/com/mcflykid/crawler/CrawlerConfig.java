@@ -16,16 +16,16 @@ import com.mcflykid.crawler.lib.SpringLib;
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
-@ComponentScan(basePackages = { "com.mcfly911.mcraw.jpa" })
-@EnableJpaRepositories({ "com.mcfly911.mcraw.jpa" })
+@ComponentScan(basePackages = { "com.mcflykid.crawler.jpa" })
+@EnableJpaRepositories({ "com.mcflykid.crawler.jpa" })
 public class CrawlerConfig {
 
 	public static IService getService() {
-		return loadService("root", "", "127.0.0.1", "3306", "quickload", false, 150, false);
+		return loadService("root", "", "127.0.0.1", "3306", "crawler", false, 150, false);
 	}
 
 	public static void resetDatabase() {
-		loadService("root", "", "127.0.0.1", "3306", "quickload", false, 150, true);
+		loadService("root", "", "127.0.0.1", "3306", "crawler", false, 150, true);
 	}
 
 	private static IService loadService(String username, String password, String server, String port, String db,
@@ -57,7 +57,7 @@ public class CrawlerConfig {
 	public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
 		LocalContainerEntityManagerFactoryBean bean = new LocalContainerEntityManagerFactoryBean();
 		bean.setDataSource(dataSource());
-		bean.setPackagesToScan("com.mcfly911.mcraw.jpa");
+		bean.setPackagesToScan("com.mcflykid.crawler.jpa");
 		Properties properties = new Properties();
 		properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL5Dialect");
 		properties.setProperty("hibernate.hbm2ddl.auto", overwriteAll ? "create" : "validate");
