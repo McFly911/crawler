@@ -9,66 +9,77 @@ import org.apache.commons.lang3.Validate;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.mcflykid.crawler.datasource.CrawlerDatasource;
 import com.mcflykid.crawler.exception.EndOfSsdException;
 import com.mcflykid.crawler.jpa.BaseTable;
 import com.mcflykid.crawler.jpa.IService;
 import com.mcflykid.crawler.lib.ThreadLib;
 import com.mcflykid.crawler.proxy.AbstractProxy;
 import com.mcflykid.crawler.proxy.JsoupProxy;
-import com.mcflykid.crawler.thread.ScraperBranch;
-import com.mcflykid.crawler.thread.ScraperThread;
+import com.mcflykid.crawler.thread.CrawlerGroup;
+import com.mcflykid.crawler.thread.CrawlerThread;
 
 public class Crawler {
-
+	
+	
+	
 	/* Get out from Constructor */
 	private static final Logger LOG = LogManager.getLogger(Crawler.class);
-	private Constructor<? extends ScraperThread> aircraftLoader;
+	private Constructor<? extends CrawlerThread> aircraftLoader;
 	private List<? extends BaseTable> dataList;
 	private IService service = CrawlerConfig.getService();
 	/**/
 
 	/* Constructor */
-	private List<AbstractProxy> proxyList;
-	private int threadPerProxy;
-	private int sleep;
-	private int timeout;
-	private Class<? extends ScraperThread> aircraftClass;
+	private List<AbstractProxy> proxies = null;
+	private static int threads = 1;
+	private int sleep = 0;
+	private int timeout = 0;
+	private Class<? extends CrawlerThread> clazz;
 	private List<String> userAgentList;
 	private List<String> referrerList;
 	private boolean randomizeInput;
-	private CrawlerInputCollector inputCollector;
+	private CrawlerDatasource datasource;
 	/**/
 
-	public Crawler(int carrierCapacity, int carrierCooldown, int aircraftTimeout, List<AbstractProxy> skinList,
-			Class<? extends ScraperThread> aircraftClass, List<String> userAgentList, List<String> referrerList,
-			boolean shuffleSsdList, CrawlerInputCollector tableCollector) {
-		this.threadPerProxy = carrierCapacity;
-		this.sleep = carrierCooldown;
-		this.timeout = aircraftTimeout;
-		this.proxyList = skinList;
-		this.aircraftClass = aircraftClass;
-		this.userAgentList = userAgentList;
-		this.referrerList = referrerList;
-		this.randomizeInput = shuffleSsdList;
-		this.inputCollector = tableCollector;
-
+	/**
+	 * Start with given parameters
+	 * 
+	 * @param clazz
+	 * @param datasource
+	 */
+	public static void start(Class<? extends CrawlerThread> clazz, CrawlerDatasource datasource) {
+		Crawler crawler = new Crawler();
+		crawler.setClazz(clazz);
+		crawler.setDatasource(datasource);
+		crawler.internalStart();
 	}
 
-	public void start() {
+	/**
+	 * Start with given parameters
+	 * 
+	 * @param clazz
+	 * @param datasource
+	 */
+	public static void start(Class<? extends CrawlerThread> clazz) {
+		Crawler.start(clazz, CrawlerDatasource.DEFAULT);
+	}
 
-		if (proxyList == null || proxyList.isEmpty()) {
-			proxyList = Arrays.asList(new JsoupProxy());
+	private void internalStart() {
+
+		if (proxies == null || proxies.isEmpty()) {
+			proxies = Arrays.asList(new JsoupProxy());
 		}
-		Validate.noNullElements(new Object[] { aircraftClass, service, inputCollector, proxyList });
+		Validate.noNullElements(new Object[] { clazz, datasource });
 
 		try {
-			aircraftLoader = aircraftClass.getConstructor();
+			aircraftLoader = clazz.getConstructor();
 		} catch (NoSuchMethodException | SecurityException e) {
 			LOG.fatal("", e);
 		}
 
 		while (true) {
-			dataList = inputCollector.collect(service);
+			dataList = datasource.collect(service);
 			if (dataList.size() == 0) {
 				break;
 			}
@@ -76,10 +87,10 @@ public class Crawler {
 				Collections.shuffle(dataList);
 			}
 			LOG.info("Collected " + dataList.size() + " SSDs");
-			for (AbstractProxy skin : this.proxyList) {
-				new ScraperBranch(this, skin).start();
+			for (AbstractProxy skin : this.proxies) {
+				new CrawlerGroup(this, skin).start();
 			}
-			ThreadLib.waitThreadPrefixEnd(ScraperBranch.class.getName());
+			ThreadLib.waitThreadPrefixEnd(CrawlerGroup.class.getName());
 		}
 		LOG.info("DONE!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 	}
@@ -101,11 +112,11 @@ public class Crawler {
 	}
 
 	public int getThreadPerCloak() {
-		return threadPerProxy;
+		return threads;
 	}
 
 	public void setThreadPerCloak(int carrierCapacity) {
-		this.threadPerProxy = carrierCapacity;
+		this.threads = carrierCapacity;
 	}
 
 	public int getCloakSleep() {
@@ -125,11 +136,11 @@ public class Crawler {
 	}
 
 	public List<AbstractProxy> getCloakList() {
-		return proxyList;
+		return proxies;
 	}
 
 	public void setCloakList(List<AbstractProxy> skinList) {
-		this.proxyList = skinList;
+		this.proxies = skinList;
 	}
 
 	public List<? extends BaseTable> getSsdList() {
@@ -140,19 +151,19 @@ public class Crawler {
 		this.dataList = ssdList;
 	}
 
-	public Class<? extends ScraperThread> getAircraftClass() {
-		return aircraftClass;
+	public Class<? extends CrawlerThread> getAircraftClass() {
+		return clazz;
 	}
 
-	public void setAircraftClass(Class<? extends ScraperThread> aircraftClass) {
-		this.aircraftClass = aircraftClass;
+	public void setAircraftClass(Class<? extends CrawlerThread> aircraftClass) {
+		this.clazz = aircraftClass;
 	}
 
-	public Constructor<? extends ScraperThread> getAircraftLoader() {
+	public Constructor<? extends CrawlerThread> getAircraftLoader() {
 		return aircraftLoader;
 	}
 
-	public void setAircraftLoader(Constructor<? extends ScraperThread> aircraftLoader) {
+	public void setAircraftLoader(Constructor<? extends CrawlerThread> aircraftLoader) {
 		this.aircraftLoader = aircraftLoader;
 	}
 
@@ -188,12 +199,52 @@ public class Crawler {
 		this.randomizeInput = shuffleSsdList;
 	}
 
-	public CrawlerInputCollector getTableCollector() {
-		return inputCollector;
+	public CrawlerDatasource getTableCollector() {
+		return datasource;
 	}
 
-	public void setTableCollector(CrawlerInputCollector tableCollector) {
-		this.inputCollector = tableCollector;
+	public void setTableCollector(CrawlerDatasource tableCollector) {
+		this.datasource = tableCollector;
+	}
+
+	public List<AbstractProxy> getProxies() {
+		return proxies;
+	}
+
+	public void setProxies(List<AbstractProxy> proxies) {
+		this.proxies = proxies;
+	}
+
+	public static int getThreads() {
+		return threads;
+	}
+
+	public static void setThreads(int threads) {
+		Crawler.threads = threads;
+	}
+
+	public int getSleep() {
+		return sleep;
+	}
+
+	public void setSleep(int sleep) {
+		this.sleep = sleep;
+	}
+
+	public Class<? extends CrawlerThread> getClazz() {
+		return clazz;
+	}
+
+	public void setClazz(Class<? extends CrawlerThread> clazz) {
+		this.clazz = clazz;
+	}
+
+	public CrawlerDatasource getDatasource() {
+		return datasource;
+	}
+
+	public void setDatasource(CrawlerDatasource datasource) {
+		this.datasource = datasource;
 	}
 
 }

@@ -39,7 +39,7 @@ public class JsoupProxy extends AbstractProxy {
 			cookies = new HashMap<String, String>();
 		}
 		try {
-			Response response = Jsoup.connect(url).userAgent(userAgent).referrer(referrer).timeout(timeout)
+			Response response = Jsoup.connect(url).userAgent(userAgent).referrer(referrer).timeout(timeout).ignoreContentType(true)
 					.cookies(cookies).method(Method.POST).data(params).execute();
 			// TODO : cc
 			Map<String, String> responseCookies = response.cookies();
@@ -70,7 +70,7 @@ public class JsoupProxy extends AbstractProxy {
 			cookies = new HashMap<String, String>();
 		}
 		try {
-			Response response = Jsoup.connect(url).userAgent(userAgent).referrer(referrer).timeout(timeout)
+			Response response = Jsoup.connect(url).userAgent(userAgent).referrer(referrer).timeout(timeout).ignoreContentType(true)
 					.cookies(cookies).method(Method.GET).execute();
 			// TODO : cc
 			Map<String, String> responseCookies = response.cookies();

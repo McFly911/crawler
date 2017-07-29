@@ -20,7 +20,7 @@ import com.mcflykid.crawler.proxy.AbstractProxy;
  * @author mcfly911
  *
  */
-public class ScraperBranch implements Runnable {
+public class CrawlerGroup implements Runnable {
 
 	private Thread launchAnAircraft() {
 		BaseTable data;
@@ -29,7 +29,7 @@ public class ScraperBranch implements Runnable {
 		} catch (EndOfSsdException e) {
 			return null;
 		}
-		ScraperThread aircraft = null;
+		CrawlerThread aircraft = null;
 		try {
 			aircraft = scraper.getAircraftLoader().newInstance();
 		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException
@@ -94,16 +94,16 @@ public class ScraperBranch implements Runnable {
 
 	}
 
-	public ScraperBranch(Crawler fleet, AbstractProxy skin) {
+	public CrawlerGroup(Crawler fleet, AbstractProxy skin) {
 		this.scraper = fleet;
 		this.proxy = skin;
 	}
 
 	public void start() {
-		new Thread(this, ScraperBranch.class.getName()).start();
+		new Thread(this, CrawlerGroup.class.getName()).start();
 	}
 
-	protected static final Logger LOG = LogManager.getLogger(ScraperBranch.class);
+	protected static final Logger LOG = LogManager.getLogger(CrawlerGroup.class);
 
 	private Crawler scraper;
 	private AbstractProxy proxy;

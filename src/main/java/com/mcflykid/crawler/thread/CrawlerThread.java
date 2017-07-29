@@ -4,10 +4,10 @@ import com.mcflykid.crawler.jpa.BaseTable;
 import com.mcflykid.crawler.jpa.IService;
 import com.mcflykid.crawler.proxy.AbstractProxy;
 
-public abstract class ScraperThread implements Runnable {
+public abstract class CrawlerThread implements Runnable {
 
 	protected IService service;
-	protected ScraperBranch scraperBranch;
+	protected CrawlerGroup scraperBranch;
 	protected BaseTable data;
 	protected AbstractProxy proxy;
 
@@ -17,7 +17,7 @@ public abstract class ScraperThread implements Runnable {
 		return thread;
 	}
 
-	public void setAircraftCarrier(ScraperBranch aircraftCarrier) {
+	public void setAircraftCarrier(CrawlerGroup aircraftCarrier) {
 		this.scraperBranch = aircraftCarrier;
 	}
 
