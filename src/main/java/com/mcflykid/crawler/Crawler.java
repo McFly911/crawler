@@ -93,6 +93,13 @@ public class Crawler {
 		throw new EndOfSsdException();
 	}
 
+	/**
+	 * Clear all table on database.
+	 */
+	public static void reset() {
+		CrawlerConfig.resetDatabase();
+	}
+
 	public int getThreadPerCloak() {
 		return threadPerProxy;
 	}
